@@ -17,6 +17,9 @@
         }
 
         .table_center {
+            max-width: 750px;
+            margin: 15vh auto;
+
             li {
                 width: 150px;
                 margin: 0 auto;
@@ -29,11 +32,15 @@
         }
 
         .deck {
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+
             li {
                 margin: 0 auto;
                 width: 150px;
 
-                img{
+                img {
                     width: 90%;
                 }
             }
@@ -41,28 +48,36 @@
         }
 
         body {
-            min-height: 65rem;
+            height: 98vh;
+            display: flex;
             align-items: center;
-            justify-content: center;
+            text-align: center;
             background:
                 radial-gradient(circle at 20% 20%, #277b3c 0, #16602c 55%, #0e3f1d 100%);
-            width: 100%;
+            width: 97%;
+        }
+
+        .game_field {
+            margin: 0 auto;
+            max-height: 30rem;
         }
     </style>
 </head>
 
 <body>
-    <ul class="table_center">
-        <li><img src="https://deckofcardsapi.com/static/img/AD.png" alt=""></li>
-        <li><img src="https://deckofcardsapi.com/static/img/2C.png" alt=""></li>
-        <li><img src="https://deckofcardsapi.com/static/img/3H.png" alt=""></li>
-        <li><img src="https://deckofcardsapi.com/static/img/back.png" alt=""></li>
-        <li><img src="https://deckofcardsapi.com/static/img/back.png" alt=""></li>
-    </ul>
-    <ul class="deck">
-        <li><img src="https://deckofcardsapi.com/static/img/AD.png" alt=""></li>
-        <li><img src="https://deckofcardsapi.com/static/img/AD.png" alt=""></li>
-    </ul>
+    <div class="game_field">
+        <ul class="table_center">
+            <li><img src="https://deckofcardsapi.com/static/img/AD.png" alt=""></li>
+            <li><img src="https://deckofcardsapi.com/static/img/2C.png" alt=""></li>
+            <li><img src="https://deckofcardsapi.com/static/img/3H.png" alt=""></li>
+            <li><img src="https://deckofcardsapi.com/static/img/back.png" alt=""></li>
+            <li><img src="https://deckofcardsapi.com/static/img/back.png" alt=""></li>
+        </ul>
+        <ul class="deck">
+            <li><img src="https://deckofcardsapi.com/static/img/AD.png" alt=""></li>
+            <li><img src="https://deckofcardsapi.com/static/img/AD.png" alt=""></li>
+        </ul>
+    </div>
 </body>
 
 </html>
