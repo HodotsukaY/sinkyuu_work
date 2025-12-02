@@ -12,9 +12,6 @@
             font-family: "Segoe UI", "Noto Sans JP", sans-serif;
         }
 
-
-
-
         body {
             min-height: 100vh;
             display: flex;
@@ -28,27 +25,27 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 30px;
+            gap: 35px;
         }
 
         .cards-row {
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            gap: 50px;
-            flex-wrap: wrap;
+            gap: 40px;
+            white-space: nowrap;
         }
 
         .card-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .card {
             position: relative;
-            width: 190px;
+            width: 180px;
             aspect-ratio: 63 / 88;
         }
 
@@ -89,22 +86,8 @@
         }
 
         .btn {
-            min-width: 190px;
-            padding: 12px 26px;
-            border-radius: 12px;
-            border: 3px solid #c77707;
-            background: #f4b034;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 6px 0 #b06304;
-        }
-
-        .btn2 {
-            position: relative;
-            left: 120px;
-            min-width: 190px;
-            padding: 12px 26px;
+            min-width: 170px;
+            padding: 12px 20px;
             border-radius: 12px;
             border: 3px solid #c77707;
             background: #f4b034;
@@ -126,30 +109,26 @@
 
         <div class="cards-row">
 
-            <!-- 左の裏カード + 新規 -->
-            <!-- 左の裏カード + 新規 -->
+            <!-- 新規ユーザー登録（裏カード） -->
             <div class="card-wrapper">
                 <div class="card">
-                    <img src="https://deckofcardsapi.com/static/img/back.png">
+                    <img src="https://deckofcardsapi.com/static/img/back.png" alt="back card">
                 </div>
-                <button class="btn btn-secondary">新規ユーザー登録</button>
+                <button class="btn btn-secondary">新規ユーザー</button>
             </div>
 
-            <!-- user_name -->
-            <!-- <div class="card-wrapper">
+            <!-- ゲストユーザー（ジョーカー） -->
+            <div class="card-wrapper">
                 <div class="card">
-                    <img src="img/AD.png">
-                    <div class="card-inner">
-                        <div class="field-label">user_name</div>
-                        <input class="field-input" type="text">
-                    </div>
+                    <img src="https://deckofcardsapi.com/static/img/X1.png" alt="joker card">
                 </div>
-            </div> -->
+                <button class="btn btn-secondary">ゲストユーザー</button>
+            </div>
 
             <!-- user_id -->
             <div class="card-wrapper">
                 <div class="card">
-                    <img src="img/AD.png">
+                    <img src="https://deckofcardsapi.com/static/img/2C.png" alt="2C">
                     <div class="card-inner">
                         <div class="field-label">user_id</div>
                         <input class="field-input" type="text">
@@ -160,7 +139,7 @@
             <!-- password -->
             <div class="card-wrapper">
                 <div class="card">
-                    <img src="img/2C.png">
+                    <img src="https://deckofcardsapi.com/static/img/3H.png" alt="3H">
                     <div class="card-inner">
                         <div class="field-label">password</div>
                         <input class="field-input" type="password">
@@ -170,21 +149,9 @@
 
         </div>
 
-        <button class="btn2">ログイン</button>
+        <!--👇通常ログインボタンはカード群の下中央-->
+        <button class="btn">ログイン</button>
 
-        <script>
-            const btn = document.querySelector('.btn');
-            btn.addEventListener('click', () => {
-                window.location.href = ''; // 新規登録画面へのリンク
-                console.log('新規ユーザー登録ボタンがクリックされました');
-            });
-
-            const btn2 = document.querySelector('.btn2');
-            btn2.addEventListener('click', () => {
-                window.location.href = ''; // 新規登録画面へのリンク
-                console.log('ログインボタンがクリックされました');
-            });
-        </script>
     </div>
 
 </body>
