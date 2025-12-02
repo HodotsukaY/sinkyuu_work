@@ -47,6 +47,7 @@
             position: relative;
             width: 180px;
             aspect-ratio: 63 / 88;
+            cursor: pointer;
         }
 
         .card img {
@@ -109,29 +110,29 @@
 
         <div class="cards-row">
 
-            <!-- 新規ユーザー登録（裏カード） -->
+            <!-- 新規ユーザー → New_User.html -->
             <div class="card-wrapper">
-                <div class="card">
+                <div class="card" onclick="location.href='New_User.html'">
                     <img src="https://deckofcardsapi.com/static/img/back.png" alt="back card">
                 </div>
-                <button class="btn btn-secondary">新規ユーザー</button>
+                <button class="btn btn-secondary" onclick="location.href='New_User.html'">新規ユーザー</button>
             </div>
 
-            <!-- ゲストユーザー（ジョーカー） -->
+            <!-- ゲストユーザー → GameChange.html -->
             <div class="card-wrapper">
-                <div class="card">
+                <div class="card" onclick="location.href='GameChange.html'">
                     <img src="https://deckofcardsapi.com/static/img/X1.png" alt="joker card">
                 </div>
-                <button class="btn btn-secondary">ゲストユーザー</button>
+                <button class="btn btn-secondary" onclick="location.href='GameChange.html'">ゲストユーザー</button>
             </div>
 
             <!-- user_id -->
             <div class="card-wrapper">
                 <div class="card">
-                    <img src="img\AD.png" alt="AD">
+                    <img src="img/AD.png" alt="AD">
                     <div class="card-inner">
                         <div class="field-label">user_id</div>
-                        <input class="field-input" type="text">
+                        <input class="field-input" type="text" id="userid">
                     </div>
                 </div>
             </div>
@@ -139,18 +140,18 @@
             <!-- password -->
             <div class="card-wrapper">
                 <div class="card">
-                    <img src="img\2C.png" alt="2C">
+                    <img src="img/2C.png" alt="2C">
                     <div class="card-inner">
                         <div class="field-label">password</div>
-                        <input class="field-input" type="password">
+                        <input class="field-input" type="password" id="password">
                     </div>
                 </div>
             </div>
 
         </div>
 
-        <!--👇通常ログインボタンはカード群の下中央-->
-        <button class="btn">ログイン</button>
+        <!-- 通常ログイン → GameChange.html -->
+        <button class="btn" onclick="location.href='GameChange.html'">ログイン</button>
 
     </div>
 

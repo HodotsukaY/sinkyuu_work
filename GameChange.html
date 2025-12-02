@@ -10,8 +10,8 @@
             background-color: black;
             color: aliceblue;
             border-radius: 30%;
-            width: 7%;
-            min-width: 70px;
+            width: 7vh;
+            min-width: 80px;
 
             letter-spacing: 0.3em;
             display: block;
@@ -42,6 +42,9 @@
             border-color: rgba(255, 255, 255, 0);
         }
 
+        .screen{
+            margin: 0 auto;
+        }
 
         body {
             display: flex;
@@ -56,12 +59,19 @@
 </head>
 
 <body>
-    <button class="return_btn" type="submit">◀戻る</button>
+    <button class="return_btn" onclick="location.href='login.html'">◀戻る</button>
+
     <div class="screen">
-        <button class="game_btn" type="submit"><img src="img/BJ.png" alt=""></button>
-        <button class="game_btn" type="submit"><img src="img/PK.png" alt=""></button>
+        <button class="game_btn" onclick="location.href='BJ.html'">
+            <img src="img/BJ.png" alt="BlackJack">
+        </button>
+
+        <button class="game_btn" onclick="location.href='Poker_test.html'">
+            <img src="img/PK.png" alt="Poker">
+        </button>
     </div>
-    <button class="ranking_btn" type="submit">ランキング表示</button>
+
+    <button class="ranking_btn" onclick="location.href='ranking.html'">ランキング表示</button>
 </body>
 
 </html>
