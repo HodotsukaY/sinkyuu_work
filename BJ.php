@@ -101,7 +101,7 @@ html, body {
 .chip-bar img { width:70px; cursor:pointer; transition: transform .15s; }
 .chip-bar img:hover { transform: scale(1.1); }
 
-/* ---------- 中央メッセージゾーン ---------- */
+/* ---------- メッセージゾーン ---------- */
 #center-message {
   height: 110px;
   display: flex;
@@ -122,7 +122,7 @@ html, body {
   transform: scale(1);
 }
 
-/* 思考中のドット（横並び） */
+/* 思考中の ... を横に点滅 */
 #thinking-dots {
   display: flex;
   gap: 6px;
@@ -146,32 +146,15 @@ html, body {
 #thinking-dots span:nth-child(2){ animation-delay: .15s; }
 #thinking-dots span:nth-child(3){ animation-delay: .30s; }
 
-/* デッキ表示位置 */
-#deck-pos {
-  position: fixed;
-  right: 110px;
-  top: 30px;
-  width: 110px;
-  height: 160px;
-  z-index: 9997;
-  pointer-events: none;
-  opacity: 0.95;
-}
-#deck-pos img { width:110px; height:160px; border-radius:8px; box-shadow: 0 0 12px rgba(0,0,0,0.4); }
-
 /* レスポンシブ */
 @media (max-width:600px) {
   #center-message { font-size: 26px; height: 76px; }
   .chip-bar img { width: 56px; }
   .card-slot, .slot-img, .floating-card { width: 86px; height:126px; }
-  #deck-pos { right:60px; top:14px; width:86px; height:126px; }
 }
 </style>
 </head>
 <body>
-
-<!-- デッキの見た目 -->
-<div id="deck-pos"><img src="https://deckofcardsapi.com/static/img/back.png" alt="deck" /></div>
 
 <div class="table-area">
 
@@ -196,8 +179,8 @@ html, body {
       <button class="btn" id="stand-btn">STAND</button>
       <button class="btn" id="newgame-btn" style="display:none;">NEW GAME</button>
     </div>
+    <div id="blackjack-text" style="text-align:center;font-size:28px;font-weight:bold;margin-top:10px;color:#ffd700;"></div>
   </div>
-
 </div>
 
 <!-- チップバー（そのまま） -->
@@ -227,11 +210,11 @@ let playerCards = [];
 let opponentCards = [];
 let showOpponentSecondCard = false;
 
-const dealingDelay = 480; // ms between deals
+const dealingDelay = 480; 
 const flipDuration = 380;
 const flyDuration = 420;
 
-/* ---------- ユーティリティ ---------- */
+/* UTILITY */
 function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
 
 function getSlotRect(container) {
@@ -244,6 +227,7 @@ function getSlotRect(container) {
   return rect;
 }
 
+/* 浮遊カード */
 function createFloatingCard(src) {
   const f = document.createElement("img");
   f.src = src;
@@ -255,10 +239,18 @@ function createFloatingCard(src) {
   return f;
 }
 
+/* カードの飛び出す位置を固定（右上） */
+function flyStartRect() {
+  return {
+    left: window.innerWidth - 140,
+    top: 30
+  };
+}
+
 function flyTo(floating, targetRect, revealFlip=false, finalSrc=null) {
   return new Promise(resolve => {
-    const deckEl = document.getElementById("deck-pos");
-    const dRect = deckEl.getBoundingClientRect();
+
+    const dRect = flyStartRect();
 
     floating.style.left = `${dRect.left}px`;
     floating.style.top = `${dRect.top}px`;
@@ -279,15 +271,13 @@ function flyTo(floating, targetRect, revealFlip=false, finalSrc=null) {
         if (finalSrc) floating.src = finalSrc;
         floating.style.transform = `translate3d(${dx}px, ${dy}px, 0px) rotateY(0deg)`;
         await wait(flipDuration/2 + 30);
-      } else {
-        await wait(90);
       }
       resolve();
     }, flyDuration + 10);
   });
 }
 
-/* ---------- スロットにカードを追加 ---------- */
+/* スロット */
 function appendCardToSlot(container, cardSrc, isBack=false, dataFrontSrc=null) {
   const img = document.createElement("img");
   img.className = "slot-img";
@@ -297,7 +287,7 @@ function appendCardToSlot(container, cardSrc, isBack=false, dataFrontSrc=null) {
   return img;
 }
 
-/* ---------- Deck API ---------- */
+/* Deck API */
 async function newDeck() {
   const res = await fetch("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6");
   const data = await res.json();
@@ -308,7 +298,7 @@ async function drawCard(count=1) {
   return await res.json();
 }
 
-/* ---------- メッセージ制御 ---------- */
+/* メッセージ */
 function showMessage(text) {
   centerBox.classList.remove("show");
   setTimeout(() => { centerBox.innerHTML = text; centerBox.classList.add("show"); }, 30);
@@ -320,20 +310,15 @@ function showThinking() {
     centerBox.classList.add("show");
   }, 30);
 }
-function clearMessage() {
-  centerBox.classList.remove("show");
-  setTimeout(()=> centerBox.textContent = "", 300);
-}
 
-/* ---------- 更新 ---------- */
+/* 計算 */
 function updateTotals() {
-  const pEl = document.getElementById("player-total");
-  const oEl = document.getElementById("opponent-total");
-  pEl.textContent = `合計: ${calcTotal(playerCards)}`;
-  oEl.textContent = `合計: ${showOpponentSecondCard ? calcTotal(opponentCards) : "?"}`;
+  document.getElementById("player-total").textContent =
+    `合計: ${calcTotal(playerCards)}`;
+  document.getElementById("opponent-total").textContent =
+    `合計: ${showOpponentSecondCard ? calcTotal(opponentCards) : "?"}`;
 }
 
-/* ---------- 合計計算 ---------- */
 function calcTotal(cards) {
   let total = 0;
   let aces = 0;
@@ -348,128 +333,132 @@ function calcTotal(cards) {
   return total;
 }
 
-/* ---------- 配り（アニメ） ---------- */
+/* 初期 4 枚 */
 async function dealInitialFour() {
+
   document.getElementById("player-cards").innerHTML = "";
   document.getElementById("opponent-cards").innerHTML = "";
-  playerCards = []; opponentCards = [];
+  playerCards = [];
+  opponentCards = [];
   showOpponentSecondCard = false;
-  // NOTE: intentionally NOT clearing centerBox here — keep previous result until NEW GAME pressed
   document.getElementById("newgame-btn").style.display = "none";
 
-  const seqTargets = [
-    { target: "player-cards", reveal: true },
-    { target: "opponent-cards", reveal: false },
-    { target: "player-cards", reveal: true },
-    { target: "opponent-cards", reveal: false }
+  const seq = [
+    { target:"player-cards", reveal:true },
+    { target:"opponent-cards", reveal:false },
+    { target:"player-cards", reveal:true },
+    { target:"opponent-cards", reveal:false }
   ];
 
   for (let i=0;i<4;i++){
-    const resp = await drawCard(1);
-    const card = resp.cards[0];
-    const container = document.getElementById(seqTargets[i].target);
-    const targetRect = getSlotRect(container);
+    const card = (await drawCard()).cards[0];
+    const container = document.getElementById(seq[i].target);
+    const rect = getSlotRect(container);
     const floating = createFloatingCard(CARD_BACK);
-    await flyTo(floating, targetRect, seqTargets[i].reveal, card.image);
+
+    await flyTo(floating, rect, seq[i].reveal, card.image);
     document.body.removeChild(floating);
 
-    if (seqTargets[i].target === "player-cards") {
-      appendCardToSlot(container, card.image, false, null);
+    if (seq[i].target==="player-cards"){
+      appendCardToSlot(container, card.image);
       playerCards.push(card);
     } else {
       const isSecond = (i===3);
-      if (isSecond) {
+      if (isSecond){
         appendCardToSlot(container, null, true, card.image);
       } else {
-        appendCardToSlot(container, card.image, false, null);
+        appendCardToSlot(container, card.image);
       }
       opponentCards.push(card);
     }
-
     updateTotals();
+  if (playerCards.length === 2 && calcTotal(playerCards) === 21) {
+    document.getElementById('blackjack-text').textContent = 'BLACKJACK';
+  }
     await wait(dealingDelay);
   }
 
-  // enable buttons after deal
   document.getElementById("hit-btn").disabled = false;
   document.getElementById("stand-btn").disabled = false;
 }
 
-/* ---------- player HIT ---------- */
+/* player HIT */
 async function playerHit() {
   document.getElementById("hit-btn").disabled = true;
-  const resp = await drawCard(1);
-  const card = resp.cards[0];
+
+  const card = (await drawCard()).cards[0];
   const container = document.getElementById("player-cards");
-  const targetRect = getSlotRect(container);
+  const rect = getSlotRect(container);
   const floating = createFloatingCard(CARD_BACK);
-  await flyTo(floating, targetRect, true, card.image);
+
+  await flyTo(floating, rect, true, card.image);
   document.body.removeChild(floating);
-  appendCardToSlot(container, card.image, false, null);
+
+  appendCardToSlot(container, card.image);
   playerCards.push(card);
   updateTotals();
+
   document.getElementById("hit-btn").disabled = false;
 }
 
-/* ---------- reveal dealer second ---------- */
+/* reveal dealer second */
 async function revealDealerSecond() {
   showOpponentSecondCard = true;
-  const opp = document.getElementById("opponent-cards");
-  const imgs = opp.querySelectorAll(".slot-img");
+  const imgs = document.querySelectorAll("#opponent-cards .slot-img");
   if (imgs.length >= 2) {
-    const secondImg = imgs[1];
-    const front = secondImg.dataset.front;
+    const sec = imgs[1];
+    const front = sec.dataset.front;
     if (front) {
-      secondImg.style.transition = `transform ${flipDuration/1000}s ease-in`;
-      secondImg.style.transform = `rotateY(90deg)`;
+      sec.style.transition = `transform ${flipDuration/1000}s ease-in`;
+      sec.style.transform = "rotateY(90deg)";
       await wait(flipDuration/2);
-      secondImg.src = front;
-      secondImg.style.transform = `rotateY(0deg)`;
-      await wait(flipDuration/2 + 30);
-      secondImg.style.transition = "";
-      delete secondImg.dataset.front;
+      sec.src = front;
+      sec.style.transform = "rotateY(0deg)";
+      await wait(flipDuration/2 + 20);
+      sec.style.transition = "";
+      delete sec.dataset.front;
     }
   }
   updateTotals();
 }
 
-/* ---------- dealer turn ---------- */
+/* dealerTurn */
 async function dealerTurn() {
   document.getElementById("hit-btn").disabled = true;
   document.getElementById("stand-btn").disabled = true;
 
   showThinking();
   await wait(600 + Math.random()*900);
-  await revealDealerSecond();
 
-  await wait(700 + Math.random()*900);
+  await revealDealerSecond();
+  await wait(500 + Math.random()*800);
 
   while (calcTotal(opponentCards) < 17) {
     showThinking();
-    await wait(900 + Math.random()*900);
-    const resp = await drawCard(1);
-    const card = resp.cards[0];
+    await wait(800 + Math.random()*900);
+
+    const card = (await drawCard()).cards[0];
     opponentCards.push(card);
 
     const container = document.getElementById("opponent-cards");
-    const targetRect = getSlotRect(container);
+    const rect = getSlotRect(container);
     const floating = createFloatingCard(CARD_BACK);
-    await flyTo(floating, targetRect, true, card.image);
-    document.body.removeChild(floating);
-    appendCardToSlot(container, card.image, false, null);
 
+    await flyTo(floating, rect, true, card.image);
+    document.body.removeChild(floating);
+
+    appendCardToSlot(container, card.image);
     updateTotals();
   }
 
-  // do not clear the center message here — we want final result to remain
-  await wait(200);
   showResult();
 }
 
-/* ---------- 結果表示 ---------- */
+/* showResult */
 function showResult() {
   const p = calcTotal(playerCards);
   const o = calcTotal(opponentCards);
+
   let msg = "";
   if (p > 21) msg = "あなたの負け";
   else if (o > 21) msg = "あなたの勝ち！";
@@ -477,62 +466,49 @@ function showResult() {
   else if (p < o) msg = "あなたの負け";
   else msg = "引き分け";
 
-  // 常時表示 until NEW GAME pressed
   centerBox.innerHTML = msg;
   centerBox.classList.add("show");
 
-  // disable action buttons
   document.getElementById("hit-btn").disabled = true;
   document.getElementById("stand-btn").disabled = true;
 
-  // show NEW GAME
   document.getElementById("newgame-btn").style.display = "inline-block";
 }
 
-/* ---------- NEW GAME ---------- */
+/* NEW GAME */
 document.getElementById("newgame-btn").addEventListener("click", async () => {
-  // hide newgame
   document.getElementById("newgame-btn").style.display = "none";
-
-  // clear slots and message (only here we clear the persistent message)
   document.getElementById("player-cards").innerHTML = "";
   document.getElementById("opponent-cards").innerHTML = "";
   centerBox.classList.remove("show");
   centerBox.textContent = "";
 
-  // reset arrays
   playerCards = [];
   opponentCards = [];
   showOpponentSecondCard = false;
 
-  // start fresh
   await newDeck();
   await dealInitialFour();
 });
 
-/* ---------- ボタンイベント ---------- */
+/* ボタン */
 document.getElementById("hit-btn").addEventListener("click", async () => {
   if (calcTotal(playerCards) <= 21) {
     await playerHit();
-    updateTotals();
     if (calcTotal(playerCards) > 21) {
       await revealDealerSecond();
       showResult();
     }
   }
 });
-
 document.getElementById("stand-btn").addEventListener("click", async () => {
-  document.getElementById("hit-btn").disabled = true;
-  document.getElementById("stand-btn").disabled = true;
   await dealerTurn();
 });
 
-/* ---------- 初期処理 ---------- */
+/* 初期 */
 (async function init(){
   document.getElementById("hit-btn").disabled = true;
   document.getElementById("stand-btn").disabled = true;
-  document.getElementById("newgame-btn").style.display = "none";
   await newDeck();
   await dealInitialFour();
 })();
