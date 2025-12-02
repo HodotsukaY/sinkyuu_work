@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ブラックジャック</title>
+    <style>
+        html,
+        body {
+            background: radial-gradient(circle at 20% 20%, #277b3c 0, #16602c 55%, #0e3f1d 100%);
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
+            background-attachment: fixed;
+            font-family: sans-serif;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .table-area {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0;
+        }
+
+        .opponent-area {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .opponent-cards {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        .player-area {
+            text-align: center;
+            margin-bottom: 120px;
+        }
+
+        .player-cards {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        .card-img {
+            width: 110px;
+            height: 160px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            max-width: none !important;
+            flex-shrink: 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .btn {
+            background: #f7c843;
+            color: #000;
+            padding: 14px 30px;
+            font-size: 20px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
+        #message {
+            height: 30px;
+            margin-bottom: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+        }
+
+        /* 左下カジノコイン */
+        .casino-coin {
+            position: fixed;
+            left: 10px;
+            bottom: 10px;
+            width: 80px;
+            z-index: 9999;
+            user-select: none;
+        }
+
+        .casino-coin img {
+            width: 100%;
+            display: block;
+            pointer-events: none;
+            /* クリック無効にしたい場合 */
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="table-area">
+
+        <!-- ディーラー -->
+        <div class="opponent-area">
+            <div id="opponent-name">ディーラー</div>
+            <div id="opponent-total">合計: ?</div>
+            <div class="opponent-cards" id="opponent-cards"></div>
+        </div>
+
+        <!-- プレイヤー -->
+        <div class="player-area">
+
+            <div id="message"></div>
+
+            <div id="player-total">合計: ?</div>
+            <div class="player-cards" id="player-cards"></div>
+
+            <div class="action-buttons">
+                <button class="btn" id="hit-btn">HIT</button>
+                <button class="btn" id="stand-btn">STAND</button>
+                <!-- ゲーム終了時だけ表示する -->
+                <button class="btn" id="new-game-btn" style="display:none;">NEW GAME</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 左下カジノコイン（画像は差し替えてOK） -->
+    <div class="casino-coin">
+        <img src="img/casino-coin.png" alt="casino coin">
+    </div>
+
+    <script>
+        let deckId = "";
+        async function newDeck() {
+            const res = await fetch("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6");
+            const data = await res.json();
+            deckId = data.deck_id;
+        }
+
+        async function drawCard(count = 1) {
+            const res = await fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=${count}`);
+            return await res.json();
+        }
+
+        let playerCards = [];
+        let opponentCards = [];
+        let dealerHidden = true;
+        let gameOver = false;
+        let isPlayerTurn = true;
+
+        const playerTotalEl = document.getElementById("player-total");
+        const opponentTotalEl = document.getElementById("opponent-total");
+        const messageEl = document.getElementById("message");
+        const hitBtn = document.getElementById("hit-btn");
+        const standBtn = document.getElementById("stand-btn");
+        const newGameBtn = document.getElementById("new-game-btn");
+
+        function calcTotal(cards, hideDealer = false) {
+            let total = 0;
+            let aceCount = 0;
+
+            cards.forEach((c, i) => {
+                if (hideDealer && i === 1) return; // 伏せ札は合計に含めない
+                let v = c.value;
+                if (["KING", "QUEEN", "JACK"].includes(v)) v = 10;
+                else if (v === "ACE") {
+                    v = 11;
+                    aceCount++;
+                } else {
+                    v = Number(v);
+                }
+                total += v;
+            });
+
+            while (total > 21 && aceCount > 0) {
+                total -= 10;
+                aceCount--;
+            }
+            return total;
+        }
+
+        // ディーラーのカード描画（伏せ札対応）
+        function renderDealerCards() {
+            const area = document.getElementById("opponent-cards");
+            area.innerHTML = "";
+
+            opponentCards.forEach((card, i) => {
+                const img = document.createElement("img");
+                img.className = "card-img";
+
+                if (dealerHidden && i === 1) {
+                    img.src = "https://deckofcardsapi.com/static/img/back.png"; // 裏面
+                } else {
+                    img.src = card.image;
+                }
+                area.appendChild(img);
+            });
+        }
+
+        // プレイヤーのカード描画
+        function renderCards(targetId, cards) {
+            const area = document.getElementById(targetId);
+            area.innerHTML = "";
+            cards.forEach(card => {
+                const img = document.createElement("img");
+                img.src = card.image;
+                img.className = "card-img";
+                area.appendChild(img);
+            });
+        }
+
+        function updateTotals() {
+            playerTotalEl.textContent =
+                `合計: ${calcTotal(playerCards)}`;
+
+            opponentTotalEl.textContent =
+                `合計: ${calcTotal(opponentCards, dealerHidden)}`;
+        }
+
+        function endGame(text) {
+            gameOver = true;
+            isPlayerTurn = false;
+            hitBtn.disabled = true;
+            standBtn.disabled = true;
+            messageEl.textContent = text;
+
+            // ゲーム終了時にNEW GAMEボタンを表示
+            newGameBtn.style.display = "inline-block";
+        }
+
+        // スタート時にBJチェック
+        function checkBlackjackAtStart() {
+            const p = calcTotal(playerCards);
+            const d = calcTotal(opponentCards);
+
+            if (p === 21 && d === 21) {
+                dealerHidden = false;
+                renderDealerCards();
+                updateTotals();
+                endGame("プッシュ（両者BJ）");
+            } else if (p === 21) {
+                endGame("ブラックジャック！あなたの勝ち！");
+            }
+        }
+
+        // ----------------- ラウンド開始 -----------------
+        async function startRound() {
+            playerCards = [];
+            opponentCards = [];
+            dealerHidden = true;
+            gameOver = false;
+            isPlayerTurn = true;
+            messageEl.textContent = "";
+            hitBtn.disabled = false;
+            standBtn.disabled = false;
+
+            // NEW GAMEボタンはラウンド中は隠す
+            newGameBtn.style.display = "none";
+
+            const firstDraw = await drawCard(4);
+
+            playerCards.push(firstDraw.cards[0], firstDraw.cards[2]);
+            opponentCards.push(firstDraw.cards[1], firstDraw.cards[3]);
+
+            renderCards("player-cards", playerCards);
+            renderDealerCards();
+            updateTotals();
+            checkBlackjackAtStart();
+        }
+
+        async function dealerTurn() {
+            messageEl.textContent = "ディーラーのターン…";
+            dealerHidden = false;
+            renderDealerCards();
+            updateTotals();
+
+            await new Promise(r => setTimeout(r, 500));
+
+            let dt = calcTotal(opponentCards);
+            const pt = calcTotal(playerCards);
+
+            while (dt < 17) {
+                const draw = await drawCard(1);
+                opponentCards.push(draw.cards[0]);
+                renderDealerCards();
+                updateTotals();
+                dt = calcTotal(opponentCards);
+
+                await new Promise(r => setTimeout(r, 600));
+            }
+
+            if (dt > 21) endGame("ディーラーバースト！あなたの勝ち！");
+            else if (dt > pt) endGame("ディーラーの勝ち");
+            else if (dt < pt) endGame("あなたの勝ち！");
+            else endGame("プッシュ");
+        }
+
+        async function onHit() {
+            if (!isPlayerTurn || gameOver) return;
+            const draw = await drawCard(1);
+            playerCards.push(draw.cards[0]);
+            renderCards("player-cards", playerCards);
+            updateTotals();
+
+            const total = calcTotal(playerCards);
+            if (total > 21) endGame("バースト！負け…");
+            else if (total === 21) await onStand();
+        }
+
+        async function onStand() {
+            if (!isPlayerTurn || gameOver) return;
+            isPlayerTurn = false;
+            await dealerTurn();
+        }
+
+        async function onNewGame() {
+            // デッキは同じでシャッフルだけ
+            if (deckId) {
+                await fetch(`https://deckofcardsapi.com/api/deck/${deckId}/shuffle/`);
+            }
+            await startRound();
+        }
+
+        hitBtn.addEventListener("click", onHit);
+        standBtn.addEventListener("click", onStand);
+        newGameBtn.addEventListener("click", onNewGame);
+
+        (async function initGame() {
+            await newDeck();
+            await startRound();
+        })();
+    </script>
+</body>
+
+</html>
