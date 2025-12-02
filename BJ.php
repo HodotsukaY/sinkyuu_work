@@ -101,6 +101,34 @@ html, body {
 .chip-bar img { width:70px; cursor:pointer; transition: transform .15s; }
 .chip-bar img:hover { transform: scale(1.1); }
 
+/* BET ボックス（チップの下） */
+#bet-container {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:6px;
+}
+#bet-box {
+  background: rgba(0,0,0,0.75);
+  padding: 8px 14px;
+  border-radius: 8px;
+  min-width: 160px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #39ff14;
+}
+#bet-controls button {
+  background:#333;
+  color:#fff;
+  border:none;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:700;
+}
+#bet-controls button:hover{ background:#555 }
+
 /* ---------- メッセージゾーン ---------- */
 #center-message {
   height: 110px;
@@ -151,6 +179,7 @@ html, body {
   #center-message { font-size: 26px; height: 76px; }
   .chip-bar img { width: 56px; }
   .card-slot, .slot-img, .floating-card { width: 86px; height:126px; }
+  #bet-box{ min-width:120px; font-size:16px }
 }
 </style>
 </head>
@@ -184,7 +213,7 @@ html, body {
 </div>
 
 <!-- チップバー（そのまま） -->
-<div class="chip-bar">
+<div class="chip-bar" id="chip-bar">
   <div class="chip-row">
     <img src="img/chip1.png" data-value="1" />
     <img src="img/chip5.png" data-value="5" />
@@ -195,6 +224,15 @@ html, body {
     <img src="img/chip50.png" data-value="50" />
     <img src="img/chip100.png" data-value="100" />
     <img src="img/chip1000.png" data-value="1000" />
+  </div>
+
+  <!-- BET ボックス：チップの下に表示 -->
+  <div id="bet-container">
+    <div id="bet-box"><span id="bet-amount">0</span> pt</div>
+    <div id="bet-controls">
+      <button id="bet-max">MAX</button>
+      <button id="bet-min">MIN</button>
+    </div>
   </div>
 </div>
 
@@ -213,6 +251,27 @@ let showOpponentSecondCard = false;
 const dealingDelay = 480; 
 const flipDuration = 380;
 const flyDuration = 420;
+
+/* BET 変数 */
+let betAmount = 0;
+const betAmountEl = () => document.getElementById('bet-amount');
+function updateBetBox(){ betAmountEl().textContent = betAmount; }
+
+/* CHIP クリックで加算 */
+document.addEventListener('click', (e)=>{
+  const t = e.target;
+  if(t && t.matches && t.matches('.chip-bar img')){
+    const v = Number(t.dataset.value || 0);
+    betAmount += v;
+    updateBetBox();
+  }
+});
+
+/* MAX / MIN */
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('bet-max').addEventListener('click', ()=>{ betAmount = 1000; updateBetBox(); });
+  document.getElementById('bet-min').addEventListener('click', ()=>{ betAmount = 0; updateBetBox(); });
+});
 
 /* UTILITY */
 function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
