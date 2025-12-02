@@ -148,7 +148,7 @@
     <!-- 表面（フォーム付カード） -->
     <div class="card-front">
       <div class="card-box">
-        <img src="img\3S.png" alt="front">
+        <img src="img\3S.png" alt="3S">
 
         <div class="form-area">
           <div>User_name</div>
@@ -160,7 +160,7 @@
           <div>Password</div>
           <input type="password">
 
-          <button>OK</button>
+          <button class="ok">OK</button>
         </div>
 
       </div>
@@ -168,6 +168,17 @@
 
   </div>
 </div>
+<script>
+  
+  const ok = document.querySelector('.ok');
+  ok.addEventListener('click', () => {
+    window.location.href = 'login.html';
+  });
 
+   const back = document.querySelector('.back-btn');
+  back.addEventListener('click', () => {
+    window.location.href = 'login.html';
+  });
+</script>
 </body>
 </html>
