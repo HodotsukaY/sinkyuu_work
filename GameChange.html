@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .return_btn {
+            background-color: black;
+            color: aliceblue;
+            border-radius: 30%;
+            width: 7%;
+            min-width: 70px;
+
+            letter-spacing: 0.3em;
+            display: block;
+            position: absolute;
+            top: 10px;
+        }
+
+        .ranking_btn{
+            position: absolute;
+            bottom: 10%;
+            width: 17%;
+            height: 5%;
+            font-size: 120%;
+            background-color: goldenrod;
+            left: 40%;
+        }
+
+        img {
+            width: 100%;
+            vertical-align: top;
+            border-radius: 20%;
+        }
+
+        .game_btn {
+            width: 30%;
+            margin: 0 5vh;
+            background-color:rgba(255, 255, 255, 0);
+            border-color: rgba(255, 255, 255, 0);
+        }
+
+
+        body {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            height: 98vh;
+            background:
+                radial-gradient(circle at 20% 20%, #277b3c 0, #16602c 55%, #0e3f1d 100%);
+            width: 97%;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="return_btn" type="submit">◀戻る</button>
+    <div class="screen">
+        <button class="game_btn" type="submit"><img src="img/BJ.png" alt=""></button>
+        <button class="game_btn" type="submit"><img src="img/PK.png" alt=""></button>
+    </div>
+    <button class="ranking_btn" type="submit">ランキング表示</button>
+</body>
+
+</html>
