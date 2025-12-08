@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script type="module">
-        const gameBtn = document.querySelectorAll('.game_btn');
-        const gameImg = document.querySelectorAll('.game_img');
+        const gameBtn = document.querySelector('.game_btn');
+        const gameImg = document.querySelector('.game_img');
         gameBtn.addEventListener('mousedown', () => {
             gameImg.classList.add("little");
         })
@@ -39,7 +39,7 @@
             bottom: 10%;
             width: 17%;
             height: 5%;
-            font-size: 120%;
+            font-size: 2vw;
             background-color: goldenrod;
             left: 40%;
         }
@@ -57,10 +57,10 @@
             border-color: rgba(255, 255, 255, 0);
         }
 
-        .game_img1.little{
+        .game_img.little {
             width: 95%;
         }
-        
+
 
         .screen {
             margin: 0 auto;
