@@ -6,15 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script type="module">
-        const gameBtn = document.querySelector('.game_btn');
-        const gameImg = document.querySelector('.game_img');
-        gameBtn.addEventListener('mousedown', () => {
-            gameImg.classList.add("little");
-        })
+        const gameBtns = document.querySelectorAll('.game_btn');
+        const gameImgs = document.querySelectorAll('.game_img');
 
-        gameBtn.addEventListener('mouseup', () => {
-            gameImg.classList.remove("little");
-        })
+        gameBtns.forEach((gameBtn, i) => {
+            const gameImg = gameImgs[i];
+
+            gameBtn.addEventListener('mousedown', () => {
+                gameImg.classList.add("little");
+            });
+
+            gameBtn.addEventListener('mouseup', () => {
+                gameImg.classList.remove("little");
+            });
+        });
     </script>
     <style>
         button {
