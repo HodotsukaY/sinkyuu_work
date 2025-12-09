@@ -5,7 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script type="module">
+        const gameBtns = document.querySelectorAll('.game_btn');
+        const gameImgs = document.querySelectorAll('.game_img');
+
+        gameBtns.forEach((gameBtn, i) => {
+            const gameImg = gameImgs[i];
+
+            gameBtn.addEventListener('mousedown', () => {
+                gameImg.classList.add("little");
+            });
+
+            gameBtn.addEventListener('mouseup', () => {
+                gameImg.classList.remove("little");
+            });
+        });
+    </script>
     <style>
+        button {
+            cursor: pointer;
+        }
+
         .return_btn {
             background-color: black;
             color: aliceblue;
@@ -19,12 +39,12 @@
             top: 10px;
         }
 
-        .ranking_btn{
+        .ranking_btn {
             position: absolute;
             bottom: 10%;
             width: 17%;
             height: 5%;
-            font-size: 120%;
+            font-size: 2vw;
             background-color: goldenrod;
             left: 40%;
         }
@@ -38,11 +58,16 @@
         .game_btn {
             width: 30%;
             margin: 0 5vh;
-            background-color:rgba(255, 255, 255, 0);
+            background-color: rgba(255, 255, 255, 0);
             border-color: rgba(255, 255, 255, 0);
         }
 
-        .screen{
+        .game_img.little {
+            width: 95%;
+        }
+
+
+        .screen {
             margin: 0 auto;
         }
 
@@ -59,19 +84,12 @@
 </head>
 
 <body>
-    <button class="return_btn" onclick="location.href='login.html'">◀戻る</button>
-
+    <button class="return_btn" type="submit">◀戻る</button>
     <div class="screen">
-        <button class="game_btn" onclick="location.href='BJ.html'">
-            <img src="img/BJ.png" alt="BlackJack">
-        </button>
-
-        <button class="game_btn" onclick="location.href='Poker_test.html'">
-            <img src="img/PK.png" alt="Poker">
-        </button>
+        <button class="game_btn" type="submit"><img class="game_img" src="img/BJ.png" alt=""></button>
+        <button class="game_btn" type="submit"><img class="game_img" src="img/PK.png" alt=""></button>
     </div>
-
-    <button class="ranking_btn" onclick="location.href='ranking.html'">ランキング表示</button>
+    <button class="ranking_btn" type="submit">ランキング表示</button>
 </body>
 
 </html>
