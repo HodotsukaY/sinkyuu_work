@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ブラックジャック（配りアニメ + NEW GAME）</title>
+<title>ブラックジャック</title>
 <style>
 /* ---------- 背景 ---------- */
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  font-family: sans-serif;
+  font-family: "Helvetica Neue", Arial, sans-serif;
   color: #fff;
-  background: radial-gradient(circle, #1d6b33 0%, #0f4720 70%, #0a2f14 100%);
+  background: radial-gradient(circle, #164d2a 0%, #0f4720 50%, #083216 100%);
   background-size: cover;
   background-attachment: fixed;
 }
@@ -23,61 +23,69 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 18px 12px;
+  padding: 26px 12px;
   box-sizing: border-box;
   position: relative;
 }
 
-.opponent-area, .player-area { text-align: center; width:100%; max-width:900px; }
+/* 相手／自分領域幅を広げつつ中央に */
+.opponent-area, .player-area {
+  text-align: center;
+  width:100%;
+  max-width:1060px; /* 大きく見せるため幅拡張 */
+}
+
+/* カード領域の縦間隔を増やす */
 .opponent-cards, .player-cards {
   display: flex;
-  gap: 20px;
+  gap: 28px;
   justify-content: center;
-  margin-top: 8px;
-  min-height: 170px;
+  margin-top: 14px;
+  min-height: 220px; /* 高さを増やしてカードを大きくできる余裕を確保 */
 }
 
 /* スロット（カードが入る領域） */
-.card-slot { width:110px; height:160px; }
+.card-slot { width:160px; height:230px; }
 
-/* 実際のカード画像（固定） */
+/* 実際のカード画像（拡大） */
 .slot-img {
-  width:110px;
-  height:160px;
-  border-radius:8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.6);
+  width:160px;
+  height:230px;
+  border-radius:10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
   display:block;
   backface-visibility: hidden;
 }
 
-/* 浮遊カード（アニメ用） */
+/* 浮遊カード（アニメ用・拡大） */
 .floating-card {
   position: fixed;
-  width:110px;
-  height:160px;
-  border-radius:8px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  width:160px;
+  height:230px;
+  border-radius:10px;
+  box-shadow: 0 18px 50px rgba(0,0,0,0.6);
   transform-origin: center;
   will-change: transform, left, top;
   z-index: 9998;
 }
 
-/* ---------- ボタン ---------- */
+/* ---------- ボタン（拡大） ---------- */
 .action-buttons {
   display:flex;
-  gap:14px;
+  gap:20px;
   justify-content:center;
-  margin-top: 20px;
+  margin-top: 26px;
 }
 .btn {
   background: #f7c843;
   color: #000;
-  padding: 12px 18px;
-  font-size: 16px;
-  border-radius: 10px;
+  padding: 14px 26px;
+  font-size: 18px;
+  border-radius: 12px;
   border: none;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 800;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.15), inset 0 -4px 0 rgba(0,0,0,0.06);
 }
 .btn:disabled {
   background: #777 !important;
@@ -86,75 +94,79 @@ html, body {
   opacity: 0.6;
 }
 
-/* ---------- チップバー ---------- */
+/* ---------- チップバー（拡大） ---------- */
 .chip-bar {
   position: fixed;
-  left: 10px;
-  bottom: 10px;
+  left: 18px;
+  bottom: 18px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   z-index: 9999;
 }
-.chip-row { display:flex; gap:10px; }
-.chip-row.centered { margin-left:40px; }
-.chip-bar img { width:70px; cursor:pointer; transition: transform .15s; }
-.chip-bar img:hover { transform: scale(1.1); }
+.chip-row { display:flex; gap:14px; }
+.chip-row.centered { margin-left:42px; }
 
-/* BET ボックス（チップの下） */
+/* チップ画像を大きく */
+.chip-bar img { width:100px; cursor:pointer; transition: transform .15s; }
+.chip-bar img:hover { transform: scale(1.08); }
+
+/* BET ボックス */
 #bet-container {
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:12px;
   margin-top:6px;
 }
 #bet-box {
-  background: rgba(0,0,0,0.75);
-  padding: 8px 14px;
-  border-radius: 8px;
-  min-width: 160px;
+  background: rgba(0,0,0,0.85);
+  padding: 10px 18px;
+  border-radius: 10px;
+  min-width: 220px;
   text-align: center;
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 900;
   color: #39ff14;
+  box-shadow: inset 0 -6px 0 rgba(0,0,0,0.2);
 }
 #bet-controls button {
   background:#333;
   color:#fff;
   border:none;
-  padding:6px 10px;
-  border-radius:6px;
+  padding:8px 12px;
+  border-radius:8px;
   cursor:pointer;
-  font-weight:700;
+  font-weight:800;
 }
 #bet-controls button:hover{ background:#555 }
 
-/* ---------- メッセージゾーン ---------- */
+/* ---------- メッセージゾーン（拡大） ---------- */
 #center-message {
-  height: 110px;
+  height: 160px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40px;
-  font-weight: 800;
-  color: #fff;
-  text-shadow: 0 0 10px rgba(0,0,0,0.7);
+  font-size: 56px; /* 大きく */
+  font-weight: 900;
+  color: #00ffff; /* デフォは YOUR TURN の色に寄せる */
+  text-shadow: 0 6px 18px rgba(0,0,0,0.6);
   opacity: 0;
   transform: scale(0.98);
-  transition: opacity .45s ease, transform .35s ease;
+  transition: opacity .28s ease, transform .22s ease;
   pointer-events: none;
-  margin: 12px 0;
+  margin: 18px 0;
 }
 #center-message.show {
   opacity: 1;
   transform: scale(1);
+  pointer-events: auto;
 }
 
-/* 思考中の ... を横に点滅 */
+/* 思考中の ... を横に点滅（ドットは白でOK） */
 #thinking-dots {
   display: flex;
-  gap: 6px;
-  margin-left: 8px;
+  gap: 8px;
+  margin-left: 12px;
   align-items: center;
 }
 @keyframes blinkDots {
@@ -164,22 +176,43 @@ html, body {
   100% { opacity: 0; transform: translateY(0); }
 }
 #thinking-dots span {
-  width:8px;
-  height:8px;
+  width:10px;
+  height:10px;
   background: #fff;
   border-radius:50%;
   display:inline-block;
   animation: blinkDots 1.2s infinite;
 }
-#thinking-dots span:nth-child(2){ animation-delay: .15s; }
-#thinking-dots span:nth-child(3){ animation-delay: .30s; }
+#thinking-dots span:nth-child(2){ animation-delay: .12s; }
+#thinking-dots span:nth-child(3){ animation-delay: .24s; }
 
-/* レスポンシブ */
-@media (max-width:600px) {
-  #center-message { font-size: 26px; height: 76px; }
-  .chip-bar img { width: 56px; }
-  .card-slot, .slot-img, .floating-card { width: 86px; height:126px; }
-  #bet-box{ min-width:120px; font-size:16px }
+/* ---------- 各種微調整（見た目を右画像寄せ） ---------- */
+#opponent-name, #player-total, #opponent-total {
+  font-weight:700;
+  font-size:18px;
+  margin-top:6px;
+  color:#e8f3e8;
+}
+
+/* blackjack テキスト */
+#blackjack-text { font-size: 30px; }
+
+/* レスポンシブ - スマホでは元サイズに近づける */
+@media (max-width:900px) {
+  .opponent-cards, .player-cards { gap:16px; min-height:160px; }
+  .slot-img, .floating-card { width:120px; height:170px; }
+  .card-slot { width:120px; height:170px; }
+  .chip-bar img { width:70px; }
+  #bet-box { min-width:140px; font-size:16px; }
+  #center-message { font-size:28px; height:90px; }
+  .btn { padding:10px 16px; font-size:15px; border-radius:10px; }
+}
+
+/* 小さいスマホ */
+@media (max-width:480px) {
+  .chip-bar { left: 8px; bottom: 8px; gap:8px; }
+  .chip-row.centered { margin-left: 12px; }
+  #center-message { font-size:20px; height:72px; }
 }
 </style>
 </head>
@@ -199,20 +232,20 @@ html, body {
 
   <!-- プレイヤー -->
   <div class="player-area">
-    <div style="height:10px;"></div>
+    <div style="height:12px;"></div>
     <div id="player-total">合計: ?</div>
     <div class="player-cards" id="player-cards"></div>
 
     <div class="action-buttons">
       <button class="btn" id="hit-btn">HIT</button>
       <button class="btn" id="stand-btn">STAND</button>
-      <button class="btn" id="newgame-btn" style="display:none;">NEW GAME</button>
+      <button class="btn" id="newgame-btn" style="display:none;">NEW ROUND</button>
     </div>
     <div id="blackjack-text" style="text-align:center;font-size:28px;font-weight:bold;margin-top:10px;color:#ffd700;"></div>
   </div>
 </div>
 
-<!-- チップバー（そのまま） -->
+<!-- チップバー -->
 <div class="chip-bar" id="chip-bar">
   <div class="chip-row">
     <img src="img/chip1.png" data-value="1" />
@@ -248,14 +281,14 @@ let playerCards = [];
 let opponentCards = [];
 let showOpponentSecondCard = false;
 
-const dealingDelay = 480; 
+const dealingDelay = 480;
 const flipDuration = 380;
 const flyDuration = 420;
 
 /* BET 変数 */
 let betAmount = 0;
 const betAmountEl = () => document.getElementById('bet-amount');
-function updateBetBox(){ betAmountEl().textContent = betAmount; }
+function updateBetBox(){ betAmountEl().textContent = betAmount.toLocaleString(); }
 
 /* CHIP クリックで加算 */
 document.addEventListener('click', (e)=>{
@@ -269,7 +302,7 @@ document.addEventListener('click', (e)=>{
 
 /* MAX / MIN */
 document.addEventListener('DOMContentLoaded', ()=>{
-  document.getElementById('bet-max').addEventListener('click', ()=>{ betAmount = 1000; updateBetBox(); });
+  document.getElementById('bet-max').addEventListener('click', ()=>{ betAmount = 10000; updateBetBox(); });
   document.getElementById('bet-min').addEventListener('click', ()=>{ betAmount = 0; updateBetBox(); });
 });
 
@@ -298,11 +331,11 @@ function createFloatingCard(src) {
   return f;
 }
 
-/* カードの飛び出す位置を固定（右上） */
+/* カードの飛び出す位置（右上） */
 function flyStartRect() {
   return {
-    left: window.innerWidth - 140,
-    top: 30
+    left: window.innerWidth - 180,
+    top: 36
   };
 }
 
@@ -336,7 +369,7 @@ function flyTo(floating, targetRect, revealFlip=false, finalSrc=null) {
   });
 }
 
-/* スロット */
+/* スロットにカード追加 */
 function appendCardToSlot(container, cardSrc, isBack=false, dataFrontSrc=null) {
   const img = document.createElement("img");
   img.className = "slot-img";
@@ -357,17 +390,24 @@ async function drawCard(count=1) {
   return await res.json();
 }
 
-/* メッセージ */
-function showMessage(text) {
-  centerBox.classList.remove("show");
-  setTimeout(() => { centerBox.innerHTML = text; centerBox.classList.add("show"); }, 30);
-}
+/* メッセージ (YOUR TURN と思考中で色/文言を制御) */
 function showThinking() {
-  centerBox.classList.remove("show");
-  setTimeout(() => {
-    centerBox.innerHTML = `思考中<span id="thinking-dots"><span></span><span></span><span></span></span>`;
-    centerBox.classList.add("show");
-  }, 30);
+  const msgBox = document.getElementById("center-message");
+  msgBox.style.color = "#ffffff";  // 思考中は白
+  msgBox.innerHTML = `思考中<span id="thinking-dots"><span></span><span></span><span></span></span>`;
+  msgBox.classList.add("show");
+}
+
+function showYourTurn() {
+  const msgBox = document.getElementById("center-message");
+  msgBox.style.color = "#00ffff";   // YOUR TURN の色
+  msgBox.innerHTML = "－ YOUR TURN －";
+  msgBox.classList.add("show");
+}
+
+function hideCenter() {
+  const msgBox = document.getElementById("center-message");
+  msgBox.classList.remove("show");
 }
 
 /* 計算 */
@@ -402,6 +442,8 @@ async function dealInitialFour() {
   showOpponentSecondCard = false;
   document.getElementById("newgame-btn").style.display = "none";
 
+  hideCenter();
+
   const seq = [
     { target:"player-cards", reveal:true },
     { target:"opponent-cards", reveal:false },
@@ -431,14 +473,21 @@ async function dealInitialFour() {
       opponentCards.push(card);
     }
     updateTotals();
-  if (playerCards.length === 2 && calcTotal(playerCards) === 21) {
-    document.getElementById('blackjack-text').textContent = 'BLACKJACK';
-  }
+
+    // ブラックジャック表示
+    if (calcTotal(playerCards) === 21) {
+      document.getElementById('blackjack-text').textContent = 'BLACKJACK';
+    }
+
     await wait(dealingDelay);
   }
 
+  // 操作可能に
   document.getElementById("hit-btn").disabled = false;
   document.getElementById("stand-btn").disabled = false;
+
+  /* ★ プレイヤーのターン開始 */
+  showYourTurn();
 }
 
 /* player HIT */
@@ -457,7 +506,11 @@ async function playerHit() {
   playerCards.push(card);
   updateTotals();
 
-  document.getElementById("hit-btn").disabled = false;
+  // ★ バーストしていないなら YOUR TURN を再表示
+  if (calcTotal(playerCards) <= 21) {
+    document.getElementById("hit-btn").disabled = false;
+    showYourTurn();
+  }
 }
 
 /* reveal dealer second */
@@ -487,14 +540,14 @@ async function dealerTurn() {
   document.getElementById("stand-btn").disabled = true;
 
   showThinking();
-  await wait(600 + Math.random()*900);
+  await wait(1000); // 思考時間 1 秒（固定）
 
   await revealDealerSecond();
-  await wait(500 + Math.random()*800);
+  await wait(1000);
 
   while (calcTotal(opponentCards) < 17) {
     showThinking();
-    await wait(800 + Math.random()*900);
+    await wait(1000);
 
     const card = (await drawCard()).cards[0];
     opponentCards.push(card);
@@ -519,12 +572,13 @@ function showResult() {
   const o = calcTotal(opponentCards);
 
   let msg = "";
-  if (p > 21) msg = "あなたの負け";
-  else if (o > 21) msg = "あなたの勝ち！";
-  else if (p > o) msg = "あなたの勝ち！";
-  else if (p < o) msg = "あなたの負け";
-  else msg = "引き分け";
+  if (p > 21) msg = "YOU  LOSE";
+  else if (o > 21) msg = "YOU  WIN!";
+  else if (p > o) msg = "YOU  WIN!";
+  else if (p < o) msg = "YOU  LOSE";
+  else msg = "DRAW";
 
+  centerBox.style.color = "#ffffff";   // 勝敗は白固定
   centerBox.innerHTML = msg;
   centerBox.classList.add("show");
 
