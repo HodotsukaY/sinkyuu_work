@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 
@@ -20,6 +21,27 @@
                 gameImg.classList.remove("little");
             });
         });
+
+            const returnBtn = document.querySelector('.return_btn');
+    returnBtn.addEventListener('click', () => {
+        window.location.href = 'login.html';
+    });
+
+    const rankingBtn = document.querySelector('.ranking_btn');
+    rankingBtn.addEventListener('click', () => {
+        window.location.href = 'ranking.html';
+    });
+
+    const gameBtn = document.querySelectorAll('.game_btn');
+    gameBtn.forEach((btn, i) => {
+        btn.addEventListener('click', () => {
+            if (i === 0) {
+                window.location.href = 'BJ.html';
+            } else if (i === 1) {
+                window.location.href = 'PK.html';
+            }
+        });
+    });
     </script>
     <style>
         button {
