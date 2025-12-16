@@ -87,12 +87,23 @@ html, body {
   font-weight: 800;
   box-shadow: 0 6px 0 rgba(0,0,0,0.15), inset 0 -4px 0 rgba(0,0,0,0.06);
 }
+
+.action-buttons .btn:hover{ background:#f7c899}
+
+/* 無効状態 */
 .btn:disabled {
   background: #777 !important;
   color: #ccc !important;
   cursor: default;
   opacity: 0.6;
 }
+
+#bet-confirm:disabled {
+  background: #777;
+  color: #ccc;
+  cursor: default;
+}
+
 
 /* ---------- チップバー（拡大） ---------- */
 .chip-bar {
@@ -130,15 +141,15 @@ html, body {
   box-shadow: inset 0 -6px 0 rgba(0,0,0,0.2);
 }
 #bet-controls button {
-  background:#333;
-  color:#fff;
+  background:#f7c843;
+  color:#000;
   border:none;
   padding:8px 12px;
   border-radius:8px;
   cursor:pointer;
   font-weight:800;
 }
-#bet-controls button:hover{ background:#555 }
+#bet-controls button:hover{ background:#f7c899 }
 
 /* ---------- メッセージゾーン（拡大） ---------- */
 #center-message {
@@ -187,33 +198,51 @@ html, body {
 #thinking-dots span:nth-child(3){ animation-delay: .24s; }
 
 /* ---------- 各種微調整（見た目を右画像寄せ） ---------- */
-#opponent-name, #player-total, #opponent-total {
+#opponent-name{
   font-weight:700;
-  font-size:18px;
+  margin-right: 75px;
+  font-size:25px;
   margin-top:6px;
   color:#e8f3e8;
 }
 
+#player-total, #opponent-total {
+  font-weight:700;
+  font-size:20px;
+  margin-top:5px;
+  color:#e8f3e8;
+}
 /* blackjack テキスト */
 #blackjack-text { font-size: 30px; }
 
-/* レスポンシブ - スマホでは元サイズに近づける */
-@media (max-width:900px) {
-  .opponent-cards, .player-cards { gap:16px; min-height:160px; }
-  .slot-img, .floating-card { width:120px; height:170px; }
-  .card-slot { width:120px; height:170px; }
-  .chip-bar img { width:70px; }
-  #bet-box { min-width:140px; font-size:16px; }
-  #center-message { font-size:28px; height:90px; }
-  .btn { padding:10px 16px; font-size:15px; border-radius:10px; }
+/* ---------- CREDIT 表示ボックス ---------- */
+#credit-box {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+
+  width: 300px;
+  height: 72px;
+
+  background: #333;
+  color: #39ff14;
+
+  border-radius: 14px;
+  padding: 16px 20px;
+  box-sizing: border-box;
+
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 1px;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-/* 小さいスマホ */
-@media (max-width:480px) {
-  .chip-bar { left: 8px; bottom: 8px; gap:8px; }
-  .chip-row.centered { margin-left: 12px; }
-  #center-message { font-size:20px; height:72px; }
-}
 </style>
 </head>
 <body>
@@ -265,14 +294,22 @@ html, body {
     <div id="bet-controls">
       <button id="bet-max">MAX</button>
       <button id="bet-min">MIN</button>
+      <button id="bet-confirm" class="btn">BET</button>
+
     </div>
   </div>
 </div>
 
+<!-- 所持クレジット表示 -->
+<div id="credit-box">
+  <span>CREDIT</span>
+  <span>10000</span>
+  <span>pt</span>
+</div>
+
+
 <script>
-/* -------------------------
-   変数 / 設定
-   ------------------------- */
+/* 変数 / 設定 */
 const CARD_BACK = "https://deckofcardsapi.com/static/img/back.png";
 const centerBox = document.getElementById("center-message");
 
@@ -379,6 +416,20 @@ function appendCardToSlot(container, cardSrc, isBack=false, dataFrontSrc=null) {
   return img;
 }
 
+/* 対戦相手名（randomuser API）*/
+async function setOpponentName() {
+  try {
+    const res = await fetch("https://randomuser.me/api/?inc=name");
+    const data = await res.json();
+    const name = data.results[0].name;
+
+    document.getElementById("opponent-name").textContent =
+    `対戦相手：${name.first} ${name.last}`;
+  } catch (e) {
+    document.getElementById("opponent-name").textContent = "Dealer";
+  }
+}
+
 /* Deck API */
 async function newDeck() {
   const res = await fetch("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=6");
@@ -390,7 +441,7 @@ async function drawCard(count=1) {
   return await res.json();
 }
 
-/* メッセージ (YOUR TURN と思考中で色/文言を制御) */
+/* メッセージ ) */
 function showThinking() {
   const msgBox = document.getElementById("center-message");
   msgBox.style.color = "#ffffff";  // 思考中は白
@@ -485,6 +536,14 @@ async function dealInitialFour() {
   // 操作可能に
   document.getElementById("hit-btn").disabled = false;
   document.getElementById("stand-btn").disabled = false;
+
+  const betConfirmBtn = document.getElementById("bet-confirm");
+
+  betConfirmBtn.addEventListener("click", () => {
+    // いまはロックするだけ
+    betConfirmBtn.disabled = true;
+  });
+
 
   /* ★ プレイヤーのターン開始 */
   showYourTurn();
@@ -622,9 +681,13 @@ document.getElementById("stand-btn").addEventListener("click", async () => {
 (async function init(){
   document.getElementById("hit-btn").disabled = true;
   document.getElementById("stand-btn").disabled = true;
+
+  await setOpponentName();   // ★ 対戦相手名を設定
+
   await newDeck();
   await dealInitialFour();
 })();
+
 </script>
 </body>
 </html>
