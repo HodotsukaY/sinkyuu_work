@@ -184,10 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       font-size: 18px;
     }
 
-    <?php
-    if ($j == 0) {
-      ?>
-      /* 裏面 */
+          /* 裏面 */
     .card-back img {
       width: 100%;
       height: 100%;
@@ -207,6 +204,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       object-fit: cover;
     }
 
+
+    <?php
+    if ($j == 0) {
+      ?>
+
    /* フリップアニメーション */
     @keyframes flip {
       0% {
@@ -221,11 +223,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php
     } else {
     ?>
-    .card-box img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    @keyframes flip {
+      0% {
+        transform: rotateY(180deg);
+      }
+
+      100% {
+        transform: rotateY(360deg);
+      }
     }
+
     <?php
     }
     ?>
