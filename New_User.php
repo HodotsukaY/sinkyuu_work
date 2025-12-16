@@ -269,26 +269,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <form action="" method="post">
 
             <div class="form-area">
-              <label for="userid">User_id</label>
+              <label for="userid">ユーザーID</label>
               <input type="text" id="userid" name="userid" required>
 
-              <label for="username">User_name</label>
+              <label for="username">ユーザー名</label>
               <input type="text" id="username" name="username" required>
 
-              <label for="password">Password</label>
+              <label for="password">パスワード</label>
               <input type="password" id="password" name="password" required>
 
-              <?php
-              if ($j == 1) {
-                ?>
-                <button type="submit" class="ok">戻る</button>
-                <?php
-              } else {
-                ?>
-                <button type="submit" class=".back-btn">OK</button>
-                <?php
-              }
-              ?>
+              <button type="submit">OK</button>
+
             </div>
           </form>
         </div>
@@ -297,11 +288,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </div>
   <script>
-
-    const ok = document.querySelector('.ok');
-    ok.addEventListener('click', () => {
-      window.location.href = 'login.html';
-    });
 
     const back = document.querySelector('.back-btn');
     back.addEventListener('click', () => {
