@@ -5,6 +5,70 @@
   <meta charset="UTF-8">
   <title>Card Form</title>
 
+<?php
+// ----------------------------------------------------
+// 1. データベース接続設定
+// ----------------------------------------------------
+$pdo_dsn = 'mysql:host=localhost;dbname=login_db;charset=utf8mb4;';
+$pdo_user = 'root'; //本来であればユーザを作成します
+$pdo_pass = ''; //本来であればパスワードを設定します
+$pdo_option = array(
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES => false,
+    PDO::ATTR_STRINGIFY_FETCHES => false
+);
+
+$message = "ユーザー名とパスワードを入力してください。";
+$j = 0;
+$pdo = null;
+
+// ----------------------------------------------------
+// 2. フォームデータ受信と処理
+// ----------------------------------------------------
+
+// フォームが POST メソッドで送信されたかチェック
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // データが存在するかチェック
+    if (isset( $_POST['userid'], $_POST['username'], $_POST['password'])) {
+
+        $userid = $_POST['userid'];
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+
+        // パスワードのハッシュ化（セキュリティ上必須）
+        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+        try {
+            // データベースに接続
+            $pdo = new PDO($pdo_dsn, $pdo_user, $pdo_pass, $pdo_option);
+
+            // SQLインサート文の準備（プリペアドステートメント）
+            $sql = "INSERT INTO users (user_id, user_name, password) VALUES (:user_id, :user_name, :password)";
+            $stmt = $pdo->prepare($sql);
+
+            // 値のバインド
+            $stmt->bindParam(':user_name', $username, PDO::PARAM_STR);
+            $stmt->bindParam(':user_id', $userid, PDO::PARAM_STR);
+            $stmt->bindParam(':password', $hashed_password, PDO::PARAM_STR);
+
+            // 実行
+            $stmt->execute();
+
+            $message = "✅ ユーザー **" . htmlspecialchars($username) . "** の登録が完了しました！";
+            $j = 1;
+
+        } catch (\PDOException $e) {
+            // エラー処理（開発中は詳細を表示しても良いが、本番環境では一般的なエラーメッセージに）
+            $message = "❌ データベースエラーが発生しました: " . $e->getMessage();
+        }
+    } else {
+        $message = "❌ ユーザー名またはパスワードが入力されていません。";
+    }
+}
+?>
+
   <style>
     body {
       margin: 0;
@@ -96,13 +160,6 @@
       transform: rotateY(180deg);
     }
 
-    /* カード画像 */
-    .card-box img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
     /* フォーム位置調整 */
     .form-area {
       position: absolute;
@@ -127,7 +184,30 @@
       font-size: 18px;
     }
 
-    /* フリップアニメーション */
+    <?php
+    if ($j == 0) {
+      ?>
+      /* 裏面 */
+    .card-back img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* 表面（入力画面） */
+    .card-front {
+      transform: rotateY(180deg);
+    }
+
+    /* カード画像 */
+    .card-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+   /* フリップアニメーション */
     @keyframes flip {
       0% {
         transform: rotateY(0);
@@ -137,6 +217,18 @@
         transform: rotateY(180deg);
       }
     }
+
+    <?php
+    } else {
+    ?>
+    .card-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    <?php
+    }
+    ?>
 
     body {
       min-height: 100vh;
@@ -152,7 +244,7 @@
 <body>
 
   <button class="back-btn">◀ 戻る</button>
-
+  <p style="font-weight: bold;"><?= $message ?></p>
   <!-- ▼ 裏→表の flip コンテナ ▼ -->
   <div class="flip-container">
     <div class="flip-card">
@@ -167,19 +259,31 @@
         <div class="card-box">
           <img src="img\3S.png" alt="3S">
 
-          <div class="form-area">
-            <div>User_name</div>
-            <input type="text">
+          <form action="" method="post">
 
-            <div>User_id</div>
-            <input type="text">
+            <div class="form-area">
+              <label for="userid">User_id</label>
+              <input type="text" id="userid" name="userid" required>
 
-            <div>Password</div>
-            <input type="password">
+              <label for="username">User_name</label>
+              <input type="text" id="username" name="username" required>
 
-            <button class="ok">OK</button>
-          </div>
+              <label for="password">Password</label>
+              <input type="password" id="password" name="password" required>
 
+              <?php
+              if ($j == 1) {
+                ?>
+                <button type="submit" class="ok">戻る</button>
+                <?php
+              } else {
+                ?>
+                <button type="submit" class=".back-btn">OK</button>
+                <?php
+              }
+              ?>
+            </div>
+          </form>
         </div>
       </div>
 
